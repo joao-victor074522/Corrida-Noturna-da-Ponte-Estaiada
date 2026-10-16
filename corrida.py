@@ -31,8 +31,8 @@ def calculo_valor(distancia, lote, idade):
 def codigo(nome, idade):
     # Gera o código do participante:
     partes = nome.strip().split()
-    nome1= partes[0:3].upper()
-    nome2= partes[-1:3].upper()
+    nome1= partes[0][:3].upper()
+    nome2= partes[-1][:3].upper()
     return nome1 + nome2 + str(idade)
 
 
@@ -49,9 +49,9 @@ def converter_tempo(tempo):
         if caractere not in "0123456789:":
             return -1
 
-    horas = tempo[0:2]
-    minutos = tempo[3:5]
-    segundos = tempo[6:8]
+    horas = int(tempo[0:2])
+    minutos = int(tempo[3:5])
+    segundos = int(tempo[6:8])
 
     if minutos > 59 or segundos > 59:
         return -1
@@ -66,9 +66,9 @@ def calcular_pace(tempo, distancia):
     segundos = segundos_por_km % 60
 
     if segundos < 10:
-        return str(minutos) + ":0" + str(segundos) + "min/km"
+        return str(minutos) + ":0" + str(segundos) + " min/km"
     else:
-        return str(minutos) + ":" + str(segundos) + "min/km"
+        return str(minutos) + ":" + str(segundos) + " min/km"
 
 def premiacao(idade, distancia, tempo):
     # Verifica se o corredor atingiu o tempo de premiação:
@@ -125,3 +125,12 @@ def ler_numero(mensagem, tipo):
                     return numero
         else:
             print("Valor inválido. Tente novamente.")
+
+def ler_nome():
+    # Solicita um nome válido.
+    while True:
+        nome = input("Nome completo: ").strip()
+        if len(nome.split()) >=2:
+            return nome
+        else:
+            print("Informe o nome e sobrenome!")
