@@ -134,3 +134,43 @@ def ler_nome():
             return nome
         else:
             print("Informe o nome e sobrenome!")
+
+def main():
+    # Menu principal do programa:
+
+    quantidade_inscricoes = 0
+    total_arrecadado = 0
+    while True:
+        print("\n==== CORRIDA NOTURNA DA PONTE ESTAIADA ====")
+        print("1 - Fazer inscrição")
+        print("2 - Calcular resultado")
+        print("3 - Sair")
+
+        opcao = ler_numero("Escolha uma opção: ", "menu")
+
+        if opcao == 1:
+            print("\n==== INSCRIÇÃO ====")
+            nome = ler_nome()
+            nome1 = primeiro_nome(nome)
+            idade = ler_numero("Idade: ", "idade")
+            if idade <16:
+                print("Inscrição recusada! Só podem se inscrever pessoas com 16 anos ou mais.")
+                continue
+
+            distancia = ler_numero("Distância (5 ou 10 km): ", "distancia")
+
+            lote = ler_numero("Lote (1 ou 2): ", "lote")
+
+            categoria = Idade(idade)
+            valor = calculo_valor(distancia, lote, idade)
+            gerar_codigo = codigo(nome, idade)
+
+            quantidade_inscricoes += 1
+            total_arrecadado += valor
+
+            print("\nInscrição realizada com sucesso!")
+            print("Nome: " + nome1)
+            print("Código: " + gerar_codigo)
+            print("Categoria: " + categoria)
+            print("Distância: " + str(distancia) + " km")
+            print("Valor: R$ " + format(valor, ".2f"))
