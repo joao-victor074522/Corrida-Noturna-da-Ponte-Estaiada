@@ -135,6 +135,16 @@ def ler_nome():
         else:
             print("Informe o nome e sobrenome!")
 
+def ler_tempo():
+    # Solicita o tempo até receber um formato válido.
+    while True:
+        tempo = input("Tempo (HH:MM:SS): ")
+        segundos = converter_tempo(tempo)
+        if segundos != -1:
+            return segundos
+        else:
+            print("Tempo inválido! Tente novamente.")
+
 def main():
     # Menu principal do programa:
 
@@ -174,3 +184,36 @@ def main():
             print("Categoria: " + categoria)
             print("Distância: " + str(distancia) + " km")
             print("Valor: R$ " + format(valor, ".2f"))
+
+        elif opcao == 2:
+            print("\n==== RESULTADO ====")
+            idade = ler_numero("Idade: ", "idade")
+            distancia = ler_numero("Distância (5 ou 10 km): ", "distancia")
+            tempo = ler_tempo()
+
+            if idade < 16:
+                categoria = "Não elegível"
+                premiado = "Não"
+            else:
+                categoria = Idade(idade)
+                premiado = premiacao(idade, distancia, tempo)
+
+            pace = calcular_pace(tempo, distancia)
+
+            print("\n==== RESULTADO FINAL ====")
+            print("Categoria: " + categoria)
+            print("Tempo em segundos: " + str(tempo))
+            print("Pace: " + pace)
+
+            if premiado == "Sim":
+                print("Premiado: Sim!")
+            else:
+                print("Premiado: Não!")
+        elif opcao == 3:
+            print("\n==== RESUMO DA SESSÃO ====")
+            print("Inscrições realizadas: " + str(quantidade_inscricoes))
+            print("Total arrecadado: R$ " + format(total_arrecadado, ".2f"))
+            print("Programa encerrado!")
+            break
+if __name__ == "__main__":
+    main()
