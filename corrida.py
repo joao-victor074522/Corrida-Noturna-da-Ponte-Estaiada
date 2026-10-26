@@ -1,3 +1,14 @@
+# Etapa 2 - Corrida Noturna da Ponte Estaiada
+# Categorias e tempos-limites em segundos:
+CATEGORIAS = {
+    ("Juvenil", 1500, 3120),
+    ("Adulto", 1320, 2760),
+    ("Master", 1500, 3120),
+    ("Veterano", 1800, 3780)
+}
+
+# Funções da Etapa 1:
+
 def primeiro_nome(nome):
     # Retorna o primeiro nome do participante:
     partes = nome.strip().split()
@@ -73,147 +84,72 @@ def calcular_pace(tempo, distancia):
 def premiacao(idade, distancia, tempo):
     # Verifica se o corredor atingiu o tempo de premiação:
 
-    categoria = Idade(idade)
+   if idade < 16 or tempo < 0:
+       return "Não"
 
-    if categoria == "Juvenil" or categoria == "Master":
-        if distancia == 5:
-            limite = 1500
-        else:
-            limite = 3120
-    elif categoria == "Adulto":
-        if distancia == 5:
-            limite = 1320
-        else:
-            limite = 2760
-    else:
-        if distancia == 5:
-            limite = 1800
-        else:
-            limite = 3780
+   categoria = Idade(idade)
 
-    if tempo <= limite:
-        return "Sim"
-    else:
-        return "Não"
-    
-def ler_numero(mensagem, tipo):
-    # Solicita um número válido de acordo com o tipo.
-    while True:
-        entrada = input(mensagem)
-        valido = True
+   for dados in CATEGORIAS:
+       if dados[0] == categoria:
+           if distancia == 5:
+               limite = dados[1]
+           else:
+               limite = dados[2]
+           return tempo <= limite
+   return False
+# Novas funções para a etapa 2:
 
-        if entrada == "":
-            valido = False
+def codigo_unico(nome, idade, codigos_usados):
+    # Evita codigos repetidos acrescentando um número ao final do código:
+    base = codigo(nome, idade)
+    codigo = base
+    numero = 2
 
-        for  caractere in entrada:
-            if caractere not in "0123456789":
-                valido = False
-        if valido:
-            numero = int(entrada)
+    while codigo in codigos_usados:
+        codigo = base + "-" + str(numero)
+        numero += 1
+    return codigo
 
-            if tipo == "idade":
-                if numero >=0:
-                    return numero
-            elif tipo == "distancia":
-                if numero == 5 or numero == 10:
-                    return numero
-            elif tipo == "lote":
-                if numero == 1 or numero == 2:
-                    return numero
-            elif tipo == "menu":
-                if numero >=1 and numero <=3:
-                    return numero
-        else:
-            print("Valor inválido. Tente novamente.")
+def formatar_tempo(tempo):
+    # Converte o tempo em segundos para o formato HH:MM:SS:
+    horas = tempo // 3600
+    minutos = (tempo % 3600) // 60
+    segundos = tempo % 60
 
-def ler_nome():
-    # Solicita um nome válido.
-    while True:
-        nome = input("Nome completo: ").strip()
-        if len(nome.split()) >=2:
-            return nome
-        else:
-            print("Informe o nome e sobrenome!")
+    h = str(horas)
+    m = str(minutos)
+    s = str(segundos)
 
-def ler_tempo():
-    # Solicita o tempo até receber um formato válido.
-    while True:
-        tempo = input("Tempo (HH:MM:SS): ")
-        segundos = converter_tempo(tempo)
-        if segundos != -1:
-            return segundos
-        else:
-            print("Tempo inválido! Tente novamente.")
+    if horas < 10:
+        h = "0" + h
+    if minutos < 10:
+        m = "0" + m
+    if segundos < 10:
+        s = "0" + s
 
-def main():
-    # Menu principal do programa:
+    return h + ":" + m + ":" + s
 
-    quantidade_inscricoes = 0
-    total_arrecadado = 0
-    while True:
-        print("\n==== CORRIDA NOTURNA DA PONTE ESTAIADA ====")
-        print("1 - Fazer inscrição")
-        print("2 - Calcular resultado")
-        print("3 - Sair")
+def buscar_indice(corredores, codigo):
+    # Busca um corredor pelo código e retorna sua posição na lista:
+    for indice in range(len(corredores)):
+        if corredores[indice]["codigo"] == codigo:
+            return indice
+    return -1
 
-        opcao = ler_numero("Escolha uma opção: ", "menu")
+def contar_categorias(corredores):
+    # Conta os inscritos de cada categoria:
+    contagem ={}
 
-        if opcao == 1:
-            print("\n==== INSCRIÇÃO ====")
-            nome = ler_nome()
-            nome1 = primeiro_nome(nome)
-            idade = ler_numero("Idade: ", "idade")
-            if idade <16:
-                print("Inscrição recusada! Só podem se inscrever pessoas com 16 anos ou mais.")
-                continue
+    for dados in CATEGORIAS:
+        contagem[dados[0]] = 0
 
-            distancia = ler_numero("Distância (5 ou 10 km): ", "distancia")
+    for corredor in corredores:
+        categoria = corredor["categoria"]
+        contagem[categoria] += 1
 
-            lote = ler_numero("Lote (1 ou 2): ", "lote")
+    return contagem
 
-            categoria = Idade(idade)
-            valor = calculo_valor(distancia, lote, idade)
-            gerar_codigo = codigo(nome, idade)
+def corredores_com_tempo(corredores):
+    # Retorna corredores que já possuem tempo registrado.
 
-            quantidade_inscricoes += 1
-            total_arrecadado += valor
-
-            print("\nInscrição realizada com sucesso!")
-            print("Nome: " + nome1)
-            print("Código: " + gerar_codigo)
-            print("Categoria: " + categoria)
-            print("Distância: " + str(distancia) + " km")
-            print("Valor: R$ " + format(valor, ".2f"))
-
-        elif opcao == 2:
-            print("\n==== RESULTADO ====")
-            idade = ler_numero("Idade: ", "idade")
-            distancia = ler_numero("Distância (5 ou 10 km): ", "distancia")
-            tempo = ler_tempo()
-
-            if idade < 16:
-                categoria = "Não elegível"
-                premiado = "Não"
-            else:
-                categoria = Idade(idade)
-                premiado = premiacao(idade, distancia, tempo)
-
-            pace = calcular_pace(tempo, distancia)
-
-            print("\n==== RESULTADO FINAL ====")
-            print("Categoria: " + categoria)
-            print("Tempo em segundos: " + str(tempo))
-            print("Pace: " + pace)
-
-            if premiado == "Sim":
-                print("Premiado: Sim!")
-            else:
-                print("Premiado: Não!")
-        elif opcao == 3:
-            print("\n==== RESUMO DA SESSÃO ====")
-            print("Inscrições realizadas: " + str(quantidade_inscricoes))
-            print("Total arrecadado: R$ " + format(total_arrecadado, ".2f"))
-            print("Programa encerrado!")
-            break
-if __name__ == "__main__":
-    main()
+    return [corredor for corredor in corredores if corredor["tempo"] != -1]
