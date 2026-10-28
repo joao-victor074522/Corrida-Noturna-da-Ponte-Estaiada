@@ -240,7 +240,7 @@ def main():
         print("2 - Listar inscritos")
         print("3 - Buscar corredor pelo código")
         print("4 - Registrar tempo de prova")
-        print("5 - Registrar tempo de prova")
+        print("5 - Inscritos por categoria")
         print("6 - Listar premiados")
         print("7 - Classificação")
         print("8 - Pódio por categoria e distância")
@@ -336,3 +336,151 @@ def main():
                         print("Premiado: SIM")
                     else:
                         print("Premiado: NÃO")
+
+        # Opção 4
+
+        elif opcao == 4:
+            print("\n==== REGISTRAR TEMPO ====")
+
+            codigo = input("Código do corredor: ").strip().upper()
+            indice = buscar_indice(corredores, codigo)
+
+            if indice == -1:
+                print("Código não encontrado!")
+                print("Não foi possivel registrar o tempo.")
+            else:
+                tempo = ler_tempo()
+                corredores[indice]["tempo"] = tempo
+                corredor = corredores[indice]
+
+                print("Tempo registrado para " + corredor["nome"] + "!")
+                print("Tempo em segundos: " + str(tempo))
+                print("Pace: " + calcular_pace(tempo, corredor["distancia"]))
+
+                if premiacao(corredor["idade"], corredor["distancia"], tempo):
+                    print("Premiado: SIM")
+                else:
+                    print("Premiado: NÃO")
+        
+        # Opção 5
+
+        elif opcao == 5:
+            print("\n==== INSCRITOS POR CATEGORIA ====")
+
+            contagem = contar_categorias(corredores)
+
+            for categoria in contagem:
+                print(categoria + ": " + str(contagem[categoria]))
+
+        # Opção 6:
+
+        elif opcao == 6:
+            print("\n==== PREMIADOS ====")
+
+            premiados = corredores_premiados(corredores)
+
+            if len(premiados) == 0:
+                print("Nenhum corredor premiado até o momento.")
+            else:
+                for corredor in premiados:
+                    print(
+                        corredor["codigo"] + " - " +
+                        corredor["nome"] + " - " +
+                        str(corredor["distancia"]) + " km - " +
+                        formatar_tempo(corredor["tempo"])
+                    )
+        # Opção 7
+
+        elif opcao == 7:
+            print("\n==== CLASSIFICAÇÃO GERAL ====")
+
+            com_tempo = corredores_com_tempo(corredores)
+
+            for distancia in (5,10):
+                print("\n" + str(distancia) + " km:")
+
+                participantes = [c for c in com_tempo if c["distancia"] == distancia]
+                classificados = sorted(participantes, key=tempo_do_corredor)
+                if len(classificados) == 0:
+                    print("Nenhum tempo registrado nessa distância.")
+                else:
+                    posicao = 1
+
+                    for corredor in classificados:
+                        print(
+                            str(posicao) + " - " +
+                            corredor["nome"] + " (" +
+                            corredor["codigo"] + ") - " +
+                            formatar_tempo(corredor["tempo"])
+                        )
+                        posicao += 1
+
+        # Opção 8 
+
+        elif opcao == 8:
+            print("\n==== PÓDIO POR CATEGORIA ====")
+
+            com_tempo = corredores_com_tempo(corredores)
+
+            for distancia in (5, 10):
+                print("\n" + str(distancia) + " km")
+
+                for dados in CATEGORIAS:
+                    categoria = dados[0]
+
+                    participantes = [c for c in com_tempo if c["distancia"] == distancia and c["categoria"] == categoria]
+                    classificados = sorted(participantes, key=tempo_do_corredor)
+                    podio = classificados[:3]
+                    print(categoria + ":")
+                    
+                    if len(podio) == 0:
+                        print(" Sem tempos registrados")
+                    else:
+                        posicao = 1
+
+                        for corredor in podio:
+                            print(
+                                str(posicao) + " - " +
+                                corredor["nome"] + " - " +
+                                formatar_tempo(corredor["tempo"])
+                            )
+
+                            posicao += 1
+
+        # Opção 9
+
+        elif opcao == 9:
+            print("\n==== RELATÓRIO FINAL====")
+
+            print("Total de inscritos: " + str(len(corredores)))
+            print("Arrecadação toal: R$ " + format(total_arrecadado, " .2f"))
+
+            com_tempo = corredores_com_tempo(corredores)
+
+            for distancia in (5, 10):
+                print("\n" + str(distancia) + " km:")
+                participantes = [c for c in com_tempo if c["distancia"] == distancia]
+
+                if len(participantes) == 0:
+                    print("Tempo médio: sem resultados registrados")
+                    print("Mais rápido: sem resultados registrados")
+                else:
+                    soma = 0
+                    for corredor in participantes:soma += corredor["tempo"]
+
+                    media = soma / len(participantes)
+
+                    mais_rapido = sorted(participantes, key=tempo_do_corredor)[0]
+
+                    print("Tempo médio: " + format(media, ".2f") + " segundos")
+                    print(
+                        "Mais rápido: " +
+                        mais_rapido["nome"] + " (" +
+                        mais_rapido["codigo"] + ") - " +
+                        formatar_tempo(mais_rapido["tempo"])
+                    )
+            print("\nPrograma encerrado!")
+            break
+
+if __name__ == "__main__":
+    main()
